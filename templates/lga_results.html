@@ -1,0 +1,40 @@
+{% extends 'layout.html' %}
+{% block content %}
+  <form action="" method="POST">
+    <label for="lga_uid">Select LGA to Display:</label>
+    <select name="lga_uid" id="lga_uid">
+      {% for lga in lgas %}
+      <option value={{ lga['lga_id'] }} >{{ lga['lga_name'] }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+  </form>
+  {% if data %}
+  <table id="example" class="table table-striped" style="width: 100%">
+    <thead>
+      <tr>
+        <th>LGA Name</th>
+        {% for heading in data[0].keys() %}
+        <th>{{ heading.replace("_", " ").title() }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in data %}
+      <tr>
+        {% for lga in lgas %}
+          {% if lga.lga_id | int == lga_id | int %}
+          <td>{{ lga.lga_name }}</td>
+          {% endif %}
+        {% endfor %}
+        {% for value in row.values() %}
+          <td>{{ value }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <h1>No Results for LGA with id {{ lga_id }}</h1>
+  {% endif %}
+{% endblock %}

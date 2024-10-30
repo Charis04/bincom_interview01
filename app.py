@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for
 import pymysql
 
 
@@ -18,8 +18,8 @@ def get_db_connection():
     return connection
 
 @app.route("/", methods=['GET', 'POST'])
-@app.route("/home", methods=['GET', 'POST'])
-def home():
+@app.route("/puresults", methods=['GET', 'POST'])
+def pu_results():
     try:
         # Connect to the database
         connection = get_db_connection()
@@ -36,7 +36,28 @@ def home():
     polling_uid = request.form.get("polling_uid")
     polling_uid = str(polling_uid)
 
-    return render_template('home.html', data=results, polling_u=polling_u, polling_id=polling_uid)
+    return render_template('pu_results.html', data=results, polling_u=polling_u, polling_id=polling_uid)
+
+@app.route("/lgaresults", methods=['GET', 'POST'])
+def lga_results():
+    lga_uid = request.form.get("lga_uid", 6)
+    lga_uid = lga_uid
+
+    try:
+        # Connect to the database
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            # Write a query to retrieve data from your table
+            cursor.execute(f"SELECT party_abbreviation, SUM(party_score) as total_score FROM announced_pu_results WHERE polling_unit_uniqueid IN (SELECT uniqueid FROM polling_unit WHERE lga_id = {lga_uid}) GROUP BY party_abbreviation")
+            results = cursor.fetchall()  # Fetch all results
+            cursor.execute("SELECT lga_id, lga_name FROM lga")
+            lgas = cursor.fetchall()
+
+    finally:
+        connection.close()
+
+    print(type(results), results)
+    return render_template('lga_results.html', data=results, lgas=lgas, lga_id=lga_uid)
 
 if __name__ == "__main__":
     app.run(debug=True)
