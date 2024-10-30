@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import pymysql
 
 
@@ -17,8 +17,8 @@ def get_db_connection():
     connection = pymysql.connect(**DB_CONFIG)
     return connection
 
-@app.route("/")
-@app.route("/home")
+@app.route("/", methods=['GET', 'POST'])
+@app.route("/home", methods=['GET', 'POST'])
 def home():
     try:
         # Connect to the database
@@ -27,13 +27,16 @@ def home():
             # Write a query to retrieve data from your table
             cursor.execute("SELECT * FROM announced_pu_results")
             results = cursor.fetchall()  # Fetch all results
-            cursor.execute("SELECT polling_unit_id, polling_unit_name FROM polling_unit WHERE polling_unit_id BETWEEN 8 AND 27 ORDER BY polling_unit_name ASC")
+            cursor.execute("SELECT uniqueid, polling_unit_name FROM polling_unit WHERE uniqueid BETWEEN 8 AND 27 ORDER BY polling_unit_name ASC")
             polling_u = cursor.fetchall()
 
     finally:
         connection.close()
 
-    return render_template('home.html', data=results, polling_u=polling_u)
+    polling_uid = request.form.get("polling_uid")
+    polling_uid = str(polling_uid)
+
+    return render_template('home.html', data=results, polling_u=polling_u, polling_id=polling_uid)
 
 if __name__ == "__main__":
     app.run(debug=True)

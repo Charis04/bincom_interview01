@@ -4,44 +4,50 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Election</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css">
   </head>
   <body>
-    <form action="/" method="GET">
-      <label for="polling_u">Select Polling Unit to Display:</label>
-      <select name="polling_u" id="polling_u">
-        {% for polling in polling_u %}
-        <option value={{ polling['polling_unit_id'] }} >{{ polling['polling_unit_name'] }}</option>
-        {% endfor %}
-      </select>
-      <button type="submit">Filter</button>
-    </form>
-    <table id="example" class="table table-striped" style="width: 100%">
-      <thead>
-        <tr>
-          {% for heading in data[0].keys() %}
-          <th>{{ heading.replace("_", " ").title() }}</th>
+    <div class="container">
+      <form action="/" method="POST">
+        <label for="polling_uid">Select Polling Unit to Display:</label>
+        <select name="polling_uid" id="polling_uid">
+          {% for polling in polling_u %}
+          <option value={{ polling['uniqueid'] }} >{{ polling['polling_unit_name'] }}</option>
           {% endfor %}
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in data %}
-        <tr>
-          {% for value in row.values() %}
-          <td>{{ value }}</td>
+        </select>
+        <button type="submit">Filter</button>
+      </form>
+      <table id="example" class="table table-striped" style="width: 100%">
+        <thead>
+          <tr>
+            {% for heading in data[0].keys() %}
+            <th>{{ heading.replace("_", " ").title() }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in data %}
+            {% if row.polling_unit_uniqueid == polling_id %}
+            <tr>
+              {% for value in row.values() %}
+              <td>{{ value }}</td>
+              {% endfor %}
+            </tr>
+            {% endif %}
           {% endfor %}
-        </tr>
-        {% endfor %}
-      </tbody>
-      <tfoot>
-        <tr>
-          <th>Name</th>
-          <th>Position</th>
-          <th>Office</th>
-          <th>Age</th>
-          <th>Start date</th>
-          <th>Salary</th>
-        </tr>
-      </tfoot>
-    </table>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Office</th>
+            <th>Age</th>
+            <th>Start date</th>
+            <th>Salary</th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
   </body>
 </html>
